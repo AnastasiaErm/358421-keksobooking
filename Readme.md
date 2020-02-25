@@ -47,5 +47,5 @@ git clone SSH-адрес_вашего_форка
 
 Репозиторий создан для обучения на интенсивном онлайн‑курсе «[Профессиональный JavaScript](https://htmlacademy.ru/intensive/javascript)», уровень 1 от [HTML Academy](https://htmlacademy.ru).
 
-[travis-image]: https://travis-ci.com/AnastasiaErm/358421-keksobooking.svg?branch=master
-[travis-url]: https://travis-ci.com/AnastasiaErm/358421-keksobooking
+[travis-image]: https://travis-ci.org/AnastasiaErm/358421-keksobooking.svg?branch=master
+[travis-url]: https://travis-ci.org/AnastasiaErm/358421-keksobooking
