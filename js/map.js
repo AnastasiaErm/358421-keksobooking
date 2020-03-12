@@ -1,8 +1,21 @@
 'use strict';
 
+var ESC_KEYCODE = 27;
+
 var ADS_AMOUNT = 8;
+
 var authorData = {
   AVATARS: 'img/avatars/user'
+};
+
+var mainPinSize = {
+  WIDTH: 62,
+  HEIGHT: 80
+};
+
+var pinSize = {
+  WIDTH: 50,
+  HEIGHT: 70
 };
 
 var configPhotoElement = {
@@ -74,17 +87,25 @@ var translationEstateTypes = {
   palace: 'Дворец'
 };
 
+var adActive;
+var pinActive;
+
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
 
 var template = document.querySelector('template');
 var adTemplate = template.content.querySelector('.map__card');
-
 var mapPinTemplate = template.content.querySelector('.map__pin');
 
 var similarPinElement = document.querySelector('.map__pins');
 var similarAdElement = document.querySelector('.map__filters-container');
 
+var mapPinMain = document.querySelector('.map__pin--main');
+
+var noticeForm = document.querySelector('.notice__form');
+
+var fieldsets = document.querySelectorAll('fieldset');
+
+var inputAddress = noticeForm.querySelector('#address');
 
 // Возврат случайного элемента массива
 var getRandomArrayElement = function (array) {
@@ -169,8 +190,39 @@ var createPhotoElement = function (pathPhoto) {
   return newElementPhoto;
 };
 
+// скрытие объявления
+var hideAd = function () {
+  if (adActive) {
+    adActive.remove();
+  }
+};
+
+// снятие выделения активной точки
+var removeActivePin = function () {
+  if (pinActive) {
+    pinActive.classList.remove('map__pin--active');
+  }
+};
+
+// Обработчик скрытия объявления
+var onElementAction = function () {
+  hideAd();
+  removeActivePin();
+  document.removeEventListener('keydown', onAdCloseEsc);
+};
+
+// обработчик закрытия объявления при нажатии на ESC
+var onAdCloseEsc = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    onElementAction();
+  }
+};
+
+// создание объявления о недвижимости
 var createAdElement = function (ad) {
   var adElement = adTemplate.cloneNode(true);
+  var adClose = adElement.querySelector('.popup__close');
+
   adElement.querySelector('.popup__title').textContent = ad.offer.title;
   adElement.querySelector('.popup__text--address').textContent = ad.offer.address;
   adElement.querySelector('.popup__text--price').textContent = ad.offer.price + '₽/ночь';
@@ -192,15 +244,38 @@ var createAdElement = function (ad) {
     photoParent.appendChild(createPhotoElement(item));
   });
   adElement.querySelector('.popup__avatar').src = ad.author.avatar;
+
+  // обработчик события click
+  adClose.addEventListener('click', onElementAction);
+
+  // обработчик события keydown
+  document.addEventListener('keydown', onAdCloseEsc);
+
   return adElement;
+};
+
+var showFullAd = function (element) {
+  hideAd();
+  adActive = map.insertBefore(createAdElement(element), similarAdElement);
+};
+
+var activatePin = function (element) {
+  removeActivePin();
+  pinActive = element;
+  pinActive.classList.add('map__pin--active');
 };
 
 // создать метку
 var createPinElement = function (pin) {
   var pinElement = mapPinTemplate.cloneNode(true);
-  pinElement.style = 'left: ' + (pin.location.x - configPhotoElement.WIDTH / 2) + 'px; top: ' + (pin.location.y - configPhotoElement.HEIGHT) + 'px';
+  pinElement.style = 'left: ' + (pin.location.x - pinSize.WIDTH / 2) + 'px; top: ' + (pin.location.y - pinSize.HEIGHT) + 'px';
   pinElement.querySelector('img').src = pin.author.avatar;
   pinElement.querySelector('img').alt = pin.offer.title;
+
+  pinElement.addEventListener('click', function () {
+    showFullAd(pin);
+    activatePin(pinElement);
+  });
   return pinElement;
 };
 
@@ -213,10 +288,60 @@ var renderPinElement = function (pins) {
   return fragment;
 };
 
-var createPins = function () {
-  var estateData = getEstateAds();
-  similarPinElement.appendChild(renderPinElement(estateData));
-  map.insertBefore(createAdElement(estateData[0]), similarAdElement);
+// деактивировать теги fieldset
+var disableFieldsets = function (fieldset) {
+  fieldset.forEach(function (item) {
+    item.disabled = true;
+  });
 };
 
-createPins();
+// активировать теги fieldset
+var enableFieldsets = function (fieldset) {
+  fieldset.forEach(function (item) {
+    item.disabled = false;
+  });
+};
+
+// запись координаты главного пина в поле адреса
+var setAddress = function (coordinates) {
+  inputAddress.value = coordinates.x + ', ' + coordinates.y;
+};
+
+// вычисление координаты главного пина
+var getPinMainCoordinates = function () {
+  return {
+    x: mapPinMain.offsetLeft + mainPinSize.WIDTH / 2,
+    y: mapPinMain.offsetTop + mainPinSize.HEIGHT
+  };
+};
+
+// обработчик, вызывающий перевод страницы в активное состояние
+var onPinMainMouseup = function () {
+  activatePage();
+};
+
+// перевести страницу в активное состояние
+var activatePage = function () {
+  map.classList.remove('map--faded');
+  noticeForm.classList.remove('notice__form--disabled');
+
+  enableFieldsets(fieldsets);
+
+  var estateData = getEstateAds();
+  similarPinElement.appendChild(renderPinElement(estateData));
+
+  // удаление события mouseup
+  mapPinMain.removeEventListener('mouseup', onPinMainMouseup);
+
+  // вычисление коорднат главного пина и запись в поле адреса
+  setAddress(getPinMainCoordinates());
+
+};
+
+// инициализация страницы
+var initializePage = function () {
+  disableFieldsets(fieldsets);
+  mapPinMain.addEventListener('mouseup', onPinMainMouseup);
+};
+
+initializePage();
