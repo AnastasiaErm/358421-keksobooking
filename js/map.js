@@ -94,6 +94,13 @@ var roomForGuests = {
   '100': ['0'],
 };
 
+var estateTypeMinPrices = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000
+};
+
 var adActive;
 var pinActive;
 
@@ -119,6 +126,10 @@ var adRoomNumber = noticeForm.querySelector('#room_number');
 var adCapacity = noticeForm.querySelector('#capacity');
 
 var adCapacityOptions = adCapacity.querySelectorAll('option');
+
+var adType = noticeForm.querySelector('#type');
+
+var adPrice = noticeForm.querySelector('#price');
 
 // Возврат случайного элемента массива
 var getRandomArrayElement = function (array) {
@@ -378,3 +389,17 @@ var onSelectRoomChange = function () {
 
 // обработчик события change
 adRoomNumber.addEventListener('change', onSelectRoomChange);
+
+// ограничение минимальной цены
+var setPriceType = function () {
+  adPrice.min = estateTypeMinPrices[adType.value];
+  adPrice.placeholder = adPrice.min;
+};
+
+// обработчик ограничение минимальной цены
+var onInputAdTypeChange = function () {
+  setPriceType();
+};
+
+// обработчик события change
+adType.addEventListener('change', onInputAdTypeChange);
