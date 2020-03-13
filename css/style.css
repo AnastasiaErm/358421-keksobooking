@@ -489,6 +489,11 @@ textarea:focus {
   font-size: 14px;
 }
 
+.form__element--invalid input,
+.form__element--invalid select {
+  border: 3px solid #ff033e;
+}
+
 .notice__preview {
   background: #dadada;
   display: inline-block;
