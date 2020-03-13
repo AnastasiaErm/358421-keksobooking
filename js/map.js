@@ -101,6 +101,11 @@ var estateTypeMinPrices = {
   palace: 10000
 };
 
+var pinMainInitialCoordinates = {
+  x: 600,
+  y: 375
+};
+
 var adActive;
 var pinActive;
 
@@ -138,6 +143,10 @@ var adTimeOut = noticeForm.querySelector('#timeout');
 var adTitle = noticeForm.querySelector('#title');
 
 var invalidFields = [];
+
+var mapPins = [];
+
+var adFormResetButton = noticeForm.querySelector('.form__reset');
 
 // Возврат случайного элемента массива
 var getRandomArrayElement = function (array) {
@@ -308,6 +317,7 @@ var createPinElement = function (pin) {
     showFullAd(pin);
     activatePin(pinElement);
   });
+  window.mapPins.push(pinElement);
   return pinElement;
 };
 
@@ -467,3 +477,54 @@ var onInputFieldValidity = function (evt) {
 adTitle.addEventListener('change', onInputFieldValidity);
 
 adPrice.addEventListener('change', onInputFieldValidity);
+
+// деактивировать форму
+var disableForm = function () {
+  noticeForm.reset();
+
+  noticeForm.classList.add('notice__form--disabled');
+
+  window.disableFieldsets(window.fieldsets);
+
+  onInputAdTypeChange();
+
+  invalidFields.forEach(function (field) {
+    field.parentNode.classList.remove('notice__form--invalid');
+  });
+};
+
+// деактивировать карту
+var disableMap = function () {
+  window.map.classList.add('map--faded');
+
+  mapPins.forEach(function (item) {
+    window.similarPinElement.removeChild(item);
+  });
+
+  window.setAddress(window.getPinMainCoordinates());
+
+  mapPins = [];
+
+  window.onElementAction();
+};
+
+// главный пин в первоначальное состояние
+var getPinMainInitialize = function () {
+  window.mapPinMain.style.left = pinMainInitialCoordinates.x + 'px';
+  window.mapPinMain.style.top = pinMainInitialCoordinates.y + 'px';
+
+  window.mapPinMain.addEventListener('mouseup', window.onPinMainMouseup);
+};
+
+// переключение страницы в первоначальное состояние
+var disablePageActive = function () {
+  disableForm();
+  disableMap();
+  getPinMainInitialize();
+};
+
+//  обработчик события click
+adFormResetButton.addEventListener('click', function (evt) {
+  evt.preventDefault();
+  disablePageActive();
+});
