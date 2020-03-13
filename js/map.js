@@ -135,6 +135,9 @@ var adTimeIn = noticeForm.querySelector('#timein');
 
 var adTimeOut = noticeForm.querySelector('#timeout');
 
+var adTitle = noticeForm.querySelector('#title');
+
+var invalidFields = [];
 
 // Возврат случайного элемента массива
 var getRandomArrayElement = function (array) {
@@ -366,6 +369,10 @@ var activatePage = function () {
   setAddress(getPinMainCoordinates());
 
   window.onSelectRoomChange();
+
+  noticeForm.addEventListener('invalid', function (evt) {
+    window.getInvalidFieldForm(evt.target);
+  }, true);
 };
 
 // инициализация страницы
@@ -429,3 +436,34 @@ var onInputTimeInChange = function (evt) {
 
 // обработчик события change
 adTimeIn.addEventListener('change', onInputTimeInChange);
+
+// выделить невалидное поле
+var getInvalidFieldForm = function (field) {
+  field.parentNode.classList.add('form__element--invalid');
+  invalidFields.push(field);
+};
+
+// снять выделение невалидного поля
+var removeInvalidFieldForm = function (field) {
+  field.parentNode.classList.remove('form__element--invalid');
+  invalidFields.splice(invalidFields.indexOf(field), 1);
+};
+
+// проверить валидность поля
+var checkValidFieldForm = function (evt) {
+  if (!evt.target.checkValidity()) {
+    getInvalidFieldForm(evt.target);
+  } else if (invalidFields.indexOf(evt.target) !== -1) {
+    removeInvalidFieldForm(evt.target);
+  }
+};
+
+// Обработчик проверки валидности поля формы
+var onInputFieldValidity = function (evt) {
+  checkValidFieldForm(evt);
+};
+
+// обработчик события change
+adTitle.addEventListener('change', onInputFieldValidity);
+
+adPrice.addEventListener('change', onInputFieldValidity);
