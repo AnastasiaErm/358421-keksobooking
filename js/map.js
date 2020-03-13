@@ -131,6 +131,11 @@ var adType = noticeForm.querySelector('#type');
 
 var adPrice = noticeForm.querySelector('#price');
 
+var adTimeIn = noticeForm.querySelector('#timein');
+
+var adTimeOut = noticeForm.querySelector('#timeout');
+
+
 // Возврат случайного элемента массива
 var getRandomArrayElement = function (array) {
   return array[Math.floor(Math.random() * array.length)];
@@ -403,3 +408,24 @@ var onInputAdTypeChange = function () {
 
 // обработчик события change
 adType.addEventListener('change', onInputAdTypeChange);
+
+// установка значения выбранного элемента
+var setElementValue = function (element, evt) {
+  element.value = evt.target.value;
+};
+
+// обработчик синхронизирующий время выезда и заезда
+var onInputTimeOutChange = function (evt) {
+  setElementValue(adTimeIn, evt);
+};
+
+// обработчик события change
+adTimeOut.addEventListener('change', onInputTimeOutChange);
+
+// обработчик синхронизирующий время заезд и выезд
+var onInputTimeInChange = function (evt) {
+  setElementValue(adTimeOut, evt);
+};
+
+// обработчик события change
+adTimeIn.addEventListener('change', onInputTimeInChange);
