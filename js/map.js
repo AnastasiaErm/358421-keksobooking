@@ -9,7 +9,7 @@ var authorData = {
 };
 
 var mainPinSize = {
-  WIDTH: 62,
+  WIDTH: 65,
   HEIGHT: 80
 };
 
@@ -87,6 +87,13 @@ var translationEstateTypes = {
   palace: 'Дворец'
 };
 
+var roomForGuests = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0'],
+};
+
 var adActive;
 var pinActive;
 
@@ -106,6 +113,12 @@ var noticeForm = document.querySelector('.notice__form');
 var fieldsets = document.querySelectorAll('fieldset');
 
 var inputAddress = noticeForm.querySelector('#address');
+
+var adRoomNumber = noticeForm.querySelector('#room_number');
+
+var adCapacity = noticeForm.querySelector('#capacity');
+
+var adCapacityOptions = adCapacity.querySelectorAll('option');
 
 // Возврат случайного элемента массива
 var getRandomArrayElement = function (array) {
@@ -336,6 +349,7 @@ var activatePage = function () {
   // вычисление коорднат главного пина и запись в поле адреса
   setAddress(getPinMainCoordinates());
 
+  window.onSelectRoomChange();
 };
 
 // инициализация страницы
@@ -345,3 +359,22 @@ var initializePage = function () {
 };
 
 initializePage();
+
+//  установка соответствия количества гостей количеству комнат
+var getNumberGuests = function () {
+  var selectedOption = roomForGuests[adRoomNumber.value];
+
+  adCapacityOptions.forEach(function (item) {
+    item.disabled = !selectedOption.includes(item.value);
+  });
+
+  adCapacity.value = selectedOption.includes(adCapacity.value) ? adCapacity.value : selectedOption[0];
+};
+
+// обработчик соответствия количества гостей количеству комнат
+var onSelectRoomChange = function () {
+  getNumberGuests();
+};
+
+// обработчик события change
+adRoomNumber.addEventListener('change', onSelectRoomChange);
