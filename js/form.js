@@ -35,8 +35,6 @@
 
   var adTitle = noticeForm.querySelector('#title');
 
-  var adFormResetButton = noticeForm.querySelector('.form__reset');
-
   var fieldsets = document.querySelectorAll('fieldset');
 
   var invalidFields = [];
@@ -134,13 +132,6 @@
       item.disabled = true;
     });
   };
-
-
-  //  обработчик события click
-  adFormResetButton.addEventListener('click', function (evt) {
-    evt.preventDefault();
-    noticeForm.reset();
-  });
 
   window.form = {
     activateForm: function () {

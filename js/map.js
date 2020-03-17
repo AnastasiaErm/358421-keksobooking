@@ -5,6 +5,8 @@
   var mapPinMain = document.querySelector('.map__pin--main');
   var similarPinElement = document.querySelector('.map__pins');
 
+  var adFormResetButton = document.querySelector('.form__reset');
+
   var disabledFieldset = document.querySelectorAll('fieldset');
 
   var ADS_AMOUNT = 8;
@@ -89,6 +91,11 @@
     window.card.removeAd();
     getPinMainInitialize();
   };
+
+  adFormResetButton.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    disablePageActive();
+  });
 
   // инициализация страницы
   var initializePage = function () {
