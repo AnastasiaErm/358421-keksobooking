@@ -1,23 +1,29 @@
 'use strict';
 (function () {
-  var ADS_AMOUNT = 8;
-
-  var mainPinData = {
-    sizes: {
-      WIDTH: 65,
-      HEIGHT: 80
-    },
-    coordinates: {
-      X: 570,
-      Y: 375
-    }
-  };
 
   var map = document.querySelector('.map');
   var mapPinMain = document.querySelector('.map__pin--main');
   var similarPinElement = document.querySelector('.map__pins');
 
   var disabledFieldset = document.querySelectorAll('fieldset');
+
+  var ADS_AMOUNT = 8;
+
+  var mainPinData = {
+    sizes: {
+      WIDTH: 66,
+      HEIGHT: 80
+    },
+    coordinates: {
+      X: 600,
+      Y: 375
+    },
+    verticalRange: {
+      Y_MIN: 130,
+      Y_MAX: 630
+    }
+  };
+
   // создание массива из n объявлений
   var getEstateAds = function () {
     var estateAds = [];
@@ -87,6 +93,55 @@
   // инициализация страницы
   var initializePage = function () {
     disablePageActive();
+    // обработчик события mousedown
+    mapPinMain.addEventListener('mousedown', function (evt) {
+      evt.preventDefault();
+
+      var startCoords = {
+        x: evt.clientX,
+        y: evt.clientY
+      };
+      // функция-обработчик, перемещающая главный пин
+      var onMouseMove = function (evtMove) {
+        evtMove.preventDefault();
+
+        var currentPosition = {
+          x: startCoords.x - evtMove.clientX,
+          y: startCoords.y - evtMove.clientY
+        };
+
+        var newPosition = {
+          x: mapPinMain.offsetLeft - currentPosition.x,
+          y: mapPinMain.offsetTop - currentPosition.y
+        };
+
+        if (newPosition.x >= mainPinData.sizes.WIDTH / 2 &&
+          newPosition.x <= map.clientWidth - mainPinData.sizes.WIDTH / 2 &&
+          newPosition.y >= mainPinData.verticalRange.Y_MIN &&
+          newPosition.y <= mainPinData.verticalRange.Y_MAX) {
+
+          mapPinMain.style.left = newPosition.x + 'px';
+          mapPinMain.style.top = newPosition.y + 'px';
+
+          window.form.setAddress(getPinMainCoordinates());
+        }
+
+        startCoords = {
+          x: evtMove.clientX,
+          y: evtMove.clientY
+        };
+      };
+
+      // функция-обработчик прекращающаяя перемещение главного пина
+      var onMouseUp = function (evtUp) {
+        evtUp.preventDefault();
+
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
     mapPinMain.addEventListener('mouseup', onPinMainMouseUp);
   };
 
