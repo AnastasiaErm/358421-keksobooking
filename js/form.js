@@ -56,9 +56,6 @@
     getNumberGuests();
   };
 
-  // обработчик события change
-  adRoomNumber.addEventListener('change', onSelectRoomChange);
-
   // ограничение минимальной цены
   var setPriceType = function () {
     adPrice.min = estateTypeMinPrices[adType.value];
@@ -70,9 +67,6 @@
     setPriceType();
   };
 
-  // обработчик события change
-  adType.addEventListener('change', onInputAdTypeChange);
-
   // установка значения выбранного элемента
   var setElementValue = function (element, evt) {
     element.value = evt.target.value;
@@ -83,21 +77,20 @@
     setElementValue(adTimeIn, evt);
   };
 
-  // обработчик события change
-  adTimeOut.addEventListener('change', onInputTimeOutChange);
-
   // обработчик синхронизирующий время заезд и выезд
   var onInputTimeInChange = function (evt) {
     setElementValue(adTimeOut, evt);
   };
 
-  // обработчик события change
-  adTimeIn.addEventListener('change', onInputTimeInChange);
-
   // выделить невалидное поле
   var getInvalidFieldForm = function (field) {
     field.parentNode.classList.add('form__element--invalid');
     invalidFields.push(field);
+  };
+
+  // обработчик валидности формы
+  var onInvalidForm = function (evt) {
+    getInvalidFieldForm(evt.target);
   };
 
   // снять выделение невалидного поля
@@ -120,26 +113,61 @@
     checkValidFieldForm(evt);
   };
 
-  // обработчик события change
-  adTitle.addEventListener('change', onInputFieldValidity);
-
-  adPrice.addEventListener('change', onInputFieldValidity);
-
 
   // деактивировать теги fieldset
-  var disableFieldsets = function (fieldset) {
+  var disableFieldset = function (fieldset) {
     fieldset.forEach(function (item) {
       item.disabled = true;
     });
   };
 
+  // обработчик успешной отправки данных формы
+  var onUploadDataSuccess = function () {
+    window.map.disablePageActive();
+    window.alert.createAlertElement();
+  };
+
+  // обработчик при ошибки отправки данных формы
+  var onUploadDataError = function (message) {
+    window.alert.createAlertElement(message);
+  };
+
+  // обработчик отправки данных на сервер
+  var onFormSubmitClick = function (evt) {
+    evt.preventDefault();
+    window.backend.save(new FormData(noticeForm), onUploadDataSuccess, onUploadDataError);
+  };
+
+  // добавить обработчики
+  var addFormListeners = function () {
+    adRoomNumber.addEventListener('change', onSelectRoomChange);
+    adType.addEventListener('change', onInputAdTypeChange);
+    adTimeOut.addEventListener('change', onInputTimeOutChange);
+    adTimeIn.addEventListener('change', onInputTimeInChange);
+    adTitle.addEventListener('change', onInputFieldValidity);
+    adPrice.addEventListener('change', onInputFieldValidity);
+    noticeForm.addEventListener('submit', onFormSubmitClick);
+    noticeForm.addEventListener('invalid', onInvalidForm, true);
+  };
+
+  // удалить обработчики
+  var removeFormListeners = function () {
+    adRoomNumber.removeEventListener('change', onSelectRoomChange);
+    adType.removeEventListener('change', onInputAdTypeChange);
+    adTimeOut.removeEventListener('change', onInputTimeOutChange);
+    adTimeIn.removeEventListener('change', onInputTimeInChange);
+    adTitle.removeEventListener('change', onInputFieldValidity);
+    adPrice.removeEventListener('change', onInputFieldValidity);
+    noticeForm.removeEventListener('submit', onFormSubmitClick);
+    noticeForm.removeEventListener('invalid', onInvalidForm, true);
+  };
+
+
   window.form = {
+    // активировать форму
     activateForm: function () {
       noticeForm.classList.remove('notice__form--disabled');
-
-      noticeForm.addEventListener('invalid', function (evt) {
-        getInvalidFieldForm(evt.target);
-      }, true);
+      addFormListeners();
     },
     // деактивировать форму
     disableForm: function () {
@@ -147,13 +175,14 @@
 
       noticeForm.classList.add('notice__form--disabled');
 
-      disableFieldsets(fieldsets);
+      disableFieldset(fieldsets);
 
       onInputAdTypeChange();
 
       invalidFields.forEach(function (field) {
         field.parentNode.classList.remove('notice__form--invalid');
       });
+      removeFormListeners();
     },
     // запись координаты главного пина в поле адреса
     setAddress: function (coordinates) {
