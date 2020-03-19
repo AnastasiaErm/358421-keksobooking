@@ -9,7 +9,6 @@
 
   var disabledFieldset = document.querySelectorAll('fieldset');
 
-  var ADS_AMOUNT = 8;
 
   var mainPinData = {
     sizes: {
@@ -26,17 +25,8 @@
     }
   };
 
-  // создание массива из n объявлений
-  var getEstateAds = function () {
-    var estateAds = [];
-    for (var i = 0; i < ADS_AMOUNT; i++) {
-      estateAds.push(window.getEstateData(i));
-    }
-    return estateAds;
-  };
-
   // активировать теги fieldset
-  var activateFieldsets = function (fieldset) {
+  var activateFieldset = function (fieldset) {
     fieldset.forEach(function (item) {
       item.disabled = false;
     });
@@ -47,15 +37,28 @@
     activatePage();
   };
 
+  // обработчик отрисовки меток на карте
+  var onLoadSuccess = function (data) {
+    var fragment = document.createDocumentFragment();
+    data.forEach(function (item) {
+      var pin = window.pins.renderPinElement(item);
+      fragment.appendChild(pin);
+    });
+    similarPinElement.appendChild(fragment);
+  };
+
+  // обработчик при возникновении ошибки загрузк данных с сервера
+  var onLoadError = function (message) {
+    window.alert.createAlertElement(message);
+  };
+
   // перевести страницу в активное состояние
   var activatePage = function () {
+    window.backend.load(onLoadSuccess, onLoadError);
     map.classList.remove('map--faded');
 
     // убрать у тегов fieldset атрибут disabled
-    activateFieldsets(disabledFieldset);
-
-    var estateData = getEstateAds();
-    similarPinElement.appendChild(window.pins.renderPinsElement(estateData));
+    activateFieldset(disabledFieldset);
 
     // удаление события mouseup
     mapPinMain.removeEventListener('mouseup', onPinMainMouseUp);
@@ -153,4 +156,7 @@
   };
 
   initializePage();
+  window.map = {
+    disablePageActive: disablePageActive
+  };
 })();
