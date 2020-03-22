@@ -37,14 +37,18 @@
     activatePage();
   };
 
-  // обработчик отрисовки меток на карте
-  var onLoadSuccess = function (data) {
+  // отрисовка меток на карте
+  var createMapPins = function (data) {
     var fragment = document.createDocumentFragment();
     data.forEach(function (item) {
       var pin = window.pins.renderPinElement(item);
       fragment.appendChild(pin);
     });
     similarPinElement.appendChild(fragment);
+  };
+
+  var onLoadSuccess = function (data) {
+    createMapPins(window.filter.activate(data));
   };
 
   // обработчик при возникновении ошибки загрузк данных с сервера
@@ -92,6 +96,7 @@
     window.form.disableForm();
     window.pins.disablePinsElement();
     window.card.removeAd();
+    window.filter.disable();
     getPinMainInitialize();
   };
 
@@ -157,6 +162,7 @@
 
   initializePage();
   window.map = {
-    disablePageActive: disablePageActive
+    disablePageActive: disablePageActive,
+    create: createMapPins
   };
 })();
