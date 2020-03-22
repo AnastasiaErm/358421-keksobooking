@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var DEBOUNCE_INTERVAL = 500;
 
   window.utils = {
     // Возврат случайного элемента массива
@@ -17,11 +18,27 @@
     getArrayStringsRandom: function (array) {
       return array.slice(window.utils.getRandomIntegerElement(0, array.length));
     },
+
     // удаление всех дочерних
     removeElementsChild: function (element) {
       while (element.firstChild) {
         element.removeChild(element.firstChild);
       }
+    },
+
+    // устранение 'дребезга' при фильтрации
+    debounce: function (cb) {
+      var lastTimeout = null;
+
+      return function () {
+        var parameters = arguments;
+        if (lastTimeout) {
+          window.clearTimeout(lastTimeout);
+        }
+        lastTimeout = window.setTimeout(function () {
+          cb.apply(null, parameters);
+        }, DEBOUNCE_INTERVAL);
+      };
     }
   };
 })();
