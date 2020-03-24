@@ -148,6 +148,7 @@
     adPrice.addEventListener('change', onInputFieldValidity);
     noticeForm.addEventListener('submit', onFormSubmitClick);
     noticeForm.addEventListener('invalid', onInvalidForm, true);
+    window.image.add();
   };
 
   // удалить обработчики
@@ -160,6 +161,7 @@
     adPrice.removeEventListener('change', onInputFieldValidity);
     noticeForm.removeEventListener('submit', onFormSubmitClick);
     noticeForm.removeEventListener('invalid', onInvalidForm, true);
+    window.image.remove();
   };
 
 
