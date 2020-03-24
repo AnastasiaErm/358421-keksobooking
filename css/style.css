@@ -612,6 +612,28 @@ textarea:focus {
   width: 140px;
 }
 
+.form__photo-container--images  {
+  display: flex;
+  flex-wrap: wrap;
+  width: auto;
+}
+
+.form__photo-container--images .upload {
+  display: flex;
+  margin-right: 10px;
+  width: 150px;
+  min-height: 70px;
+}
+
+.form__photo {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  width: 70px;
+  height: 70px;
+  background-color: #e4e4de;
+  border-radius: 5px;
+}
+
 .form__element--submit {
   width: 100%;
   padding: 40px 0;
